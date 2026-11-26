@@ -33,21 +33,21 @@ tracking:
   experiment_name: mp049-spoilage
   best_run_id: c2a002d8c9b6413cb3e0c83f6349d31a
   registered_model_name: mp049-spoilage-model
-  champion_version: 1
+  champion_version: 2
 monitoring:
   psi:
-    storage_days: null
-    temp_set_c: null
-    humidity_pct: null
-    power_cuts_hours: null
-    bag_weight_kg: null
-    door_openings_per_day: null
-  most_drifted_feature: null
+    storage_days: 6.5085
+    temp_set_c: 0.0433
+    humidity_pct: 0.0568
+    power_cuts_hours: 0.042
+    bag_weight_kg: 0.0438
+    door_openings_per_day: 0.0629
+  most_drifted_feature: storage_days
   mae_by_group:
-    Chamber 1: null
-    Chamber 2: null
-    Chamber 3: null
-  worst_served_group: null
-  mae_v1_on_check: null
-  mae_v2_on_check: null
-  decision: null
+    Chamber 1: 0.991
+    Chamber 2: 1.1045
+    Chamber 3: 5.3697
+  worst_served_group: Chamber 3
+  mae_v1_on_check: 2.6494
+  mae_v2_on_check: 1.7332
+  decision: promote
