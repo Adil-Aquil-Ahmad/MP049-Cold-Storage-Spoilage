@@ -4,7 +4,6 @@ data:
   holdout: data/raw/holdout_features.csv
 
 target: spoilage_pct
-leak_columns: []          # filled in once the data checks are done
 
 features:
   numeric:
@@ -20,6 +19,25 @@ features:
 
 model:
   random_state: 42
+  cv_folds: 5
+  candidates:              # every candidate becomes one MLflow run
+    - name: ridge
+      type: ridge
+      alpha: 1.0
+    - name: rf_200_d8
+      type: random_forest
+      n_estimators: 200
+      max_depth: 8
+    - name: gbr_300_lr005
+      type: gradient_boosting
+      n_estimators: 300
+      learning_rate: 0.05
+      max_depth: 3
+    - name: gbr_500_lr003
+      type: gradient_boosting
+      n_estimators: 500
+      learning_rate: 0.03
+      max_depth: 2
 
 mlflow:
   tracking_uri: sqlite:///mlflow.db
