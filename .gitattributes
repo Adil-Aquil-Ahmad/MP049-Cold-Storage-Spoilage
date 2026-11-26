@@ -1,0 +1,2 @@
+# Never let git rewrite line endings in data files: their hashes must match the zip
+*.csv -text

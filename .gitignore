@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# MLflow model files (the tool reads only mlflow.db, which is committed)
+mlruns/
+mlartifacts/
+
+# Course material from the zip: identical across groups, kept local only
+STUDENT_HANDBOOK.md
+PROBLEM.md
+GROUP.md

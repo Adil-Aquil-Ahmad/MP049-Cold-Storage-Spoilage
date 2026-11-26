@@ -1,0 +1,37 @@
+data:
+  train: data/raw/train.csv
+  later: data/raw/later.csv
+  holdout: data/raw/holdout_features.csv
+
+target: spoilage_pct
+leak_columns: []          # filled in once the data checks are done
+
+features:
+  numeric:
+    - storage_days
+    - temp_set_c
+    - humidity_pct
+    - power_cuts_hours
+    - bag_weight_kg
+    - door_openings_per_day
+  categorical:
+    - crop
+    - chamber
+
+model:
+  random_state: 42
+
+mlflow:
+  tracking_uri: sqlite:///mlflow.db
+  experiment_name: mp049-spoilage
+  registered_model_name: mp049-spoilage-model
+
+monitoring:
+  psi_bins: 10
+  retrain_fraction: 0.7
+  promotion_min_improvement: 0.10
+
+outputs:
+  model: models/model.joblib
+  findings: reports/findings.yaml
+  predictions: predictions/holdout_predictions.csv
