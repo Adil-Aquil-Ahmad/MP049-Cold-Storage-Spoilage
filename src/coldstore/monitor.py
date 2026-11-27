@@ -28,6 +28,25 @@ def psi(expected: pd.Series, actual: pd.Series, bins: int = 10) -> float:
     return float(np.sum((a - e) * np.log(a / e)))
 
 
+def weighted_fit(train: pd.DataFrame, new: pd.DataFrame, weight: float, cfg: dict, params: dict):
+    """Fit on train + new rows, giving the new rows `weight` times the influence."""
+    rows = pd.concat([train, new], ignore_index=True)
+    sw = np.r_[np.ones(len(train)), np.full(len(new), float(weight))]
+    return fit(rows, cfg, params, sample_weight=sw)
+
+
+def choose_weight(train, first, cfg, params) -> tuple[float, dict]:
+    """Pick the recency weight on a validation slice inside the first 70% of later.csv."""
+    split = int(len(first) * params["monitoring"]["weight_select_from"]
+                / params["monitoring"]["retrain_fraction"])
+    fit_part, val = first.iloc[:split], first.iloc[split:]
+    scores = {w: round(mae(weighted_fit(train, fit_part, w, cfg, params), val, params), 4)
+              for w in params["monitoring"]["recency_weights"]}
+    best = min(scores, key=scores.get)
+    print("recency weight -> validation MAE:", scores, "-> chosen:", best)
+    return best, scores
+
+
 def v1_config(params: dict, run_id: str) -> dict:
     name = MlflowClient().get_run(run_id).data.params["name"]
     return next(c for c in params["model"]["candidates"] if c["name"] == name)
@@ -66,14 +85,17 @@ def main() -> None:
     first, check = later.iloc[:cut], later.iloc[cut:]
     cfg = v1_config(params, findings["tracking"]["best_run_id"])
     mae_v1 = mae(v1, check, params)
+    weight, weight_scores = choose_weight(train, first, cfg, params)
 
-    with mlflow.start_run(run_name=f"v2-{cfg['name']}") as run:
-        v2 = fit(pd.concat([train, first], ignore_index=True), cfg, params)
+    with mlflow.start_run(run_name=f"v2-{cfg['name']}-w{weight}"):
+        v2 = weighted_fit(train, first, weight, cfg, params)
         mae_v2 = mae(v2, check, params)
         mlflow.log_param("data_sha256", data_sha256(params))
         mlflow.log_param("model_version", "v2")
         mlflow.log_param("train_rows", len(train) + len(first))
+        mlflow.log_param("recency_weight", weight)
         mlflow.log_params(cfg)
+        mlflow.log_metrics({f"mae_val_w{w}": s for w, s in weight_scores.items()})
         mlflow.log_metric("mae_check_v1", mae_v1)
         mlflow.log_metric("mae_check_v2", mae_v2)
         mlflow.log_metrics({f"psi_{c}": v for c, v in psis.items()})

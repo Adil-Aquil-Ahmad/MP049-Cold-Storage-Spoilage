@@ -31,7 +31,7 @@ data_issues:
     true_levels: null
 tracking:
   experiment_name: mp049-spoilage
-  best_run_id: c2a002d8c9b6413cb3e0c83f6349d31a
+  best_run_id: a575306807714f57bbaaac7e75d05dad
   registered_model_name: mp049-spoilage-model
   champion_version: 2
 monitoring:
@@ -49,5 +49,5 @@ monitoring:
     Chamber 3: 5.3697
   worst_served_group: Chamber 3
   mae_v1_on_check: 2.6494
-  mae_v2_on_check: 1.7332
+  mae_v2_on_check: 0.648
   decision: promote

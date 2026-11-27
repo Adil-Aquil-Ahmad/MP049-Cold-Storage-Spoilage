@@ -60,9 +60,10 @@ def features(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     return df[params["features"]["numeric"] + params["features"]["categorical"]]
 
 
-def fit(df: pd.DataFrame, cfg: dict, params: dict) -> Pipeline:
+def fit(df: pd.DataFrame, cfg: dict, params: dict, sample_weight=None) -> Pipeline:
     pipe = build_pipeline(cfg, params)
-    pipe.fit(features(df, params), df[params["target"]])
+    extra = {} if sample_weight is None else {"model__sample_weight": sample_weight}
+    pipe.fit(features(df, params), df[params["target"]], **extra)
     return pipe
 
 
