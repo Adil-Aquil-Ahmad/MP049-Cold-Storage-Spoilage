@@ -43,3 +43,23 @@ pip install -r requirements.txt
 pip install dvc==3.67.1        # data versioning, not needed by the service
 dvc pull                       # or copy the CSVs from the problem zip into data/raw/
 ```
+
+## Prediction API and Docker
+**Contributor:** Kanak Chaudhary
+
+**Files:** `app/main.py`, `tests/`, `Dockerfile`, `.dockerignore`
+
+### API Serving and Validation
+- FastAPI serves the trained regression model to predict `spoilage_pct`.
+- Pydantic validates all eight request fields and enforces client-specific constraints (`le=350`, `ge=20`).
+- Invalid inputs and unexpected fields return HTTP 422 before model inference.
+
+### Monitoring and Testing
+- The `/health` endpoint provides API health monitoring.
+- Structured JSON logging supports application monitoring without recording personal information.
+- API tests use a lightweight model to ensure independent and reproducible testing without relying on external CSV datasets.
+
+### Containerization
+- Docker provides an isolated and consistent deployment environment.
+- `requirements.txt` is copied before the application source code to leverage Docker layer caching and reduce rebuild time.
+- `.dockerignore` excludes unnecessary files from the build context.
